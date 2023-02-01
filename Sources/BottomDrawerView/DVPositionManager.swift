@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol DVPositionManagerDelegate: class {
+protocol DVPositionManagerDelegate: AnyObject {
 	func updateDrawerFrame(byAmount amount: CGFloat)
 	func updateDrawerPosition(_ position: DVPosition)
 }

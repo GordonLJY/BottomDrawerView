@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol DVHeaderViewDelegate: class {
+protocol DVHeaderViewDelegate: AnyObject {
 	func didPan(_ gesture: UIPanGestureRecognizer)
 	func didTapOnHeader(_ gesture: UITapGestureRecognizer)
 }

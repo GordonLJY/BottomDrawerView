@@ -8,7 +8,7 @@
 
 import UIKit
 
-public protocol DrawerViewDelegate: class {
+public protocol DrawerViewDelegate: AnyObject {
 	func drawerView(_ drawerView: DrawerView, didFinishUpdatingPosition position: DVPosition)
 	func drawerView(_ drawerView: DrawerView, didDragByAmount verticalDragAmount: CGFloat)
 }
@@ -71,33 +71,47 @@ public class DrawerView: UIView {
 	
 	// MARK: - init() and initial setup
 	public init(containing childController: UIViewController,
-					inside parentController: UIViewController,
-					headerViewHeight: CGFloat = 50)
+                inside parentController: UIViewController,
+                headerViewHeight: CGFloat = 50)
 	{
 		super.init(frame: CGRect.zero)
-		commonInit(headerViewHeight: headerViewHeight, childView: childController.view, parentController: parentController)
+        commonInit(headerViewHeight: headerViewHeight, childView: childController.view, parentView: parentController.view)
 		parentController.addChild(childController)
 		childController.didMove(toParent: parentController)
 	}
+    public init(containing childController: UIViewController,
+                inside parentView: UIView,
+                headerViewHeight: CGFloat = 50)
+    {
+        super.init(frame: CGRect.zero)
+        commonInit(headerViewHeight: headerViewHeight, childView: childController.view, parentView: parentView)
+    }
 	public init(containing childView: UIView,
-					inside parentController: UIViewController,
-					headerViewHeight: CGFloat = 50)
+                inside parentController: UIViewController,
+                headerViewHeight: CGFloat = 50)
 	{
 		super.init(frame: CGRect.zero)
-		commonInit(headerViewHeight: headerViewHeight, childView: childView, parentController: parentController)
+        commonInit(headerViewHeight: headerViewHeight, childView: childView, parentView: parentController.view)
 	}
+    public init(containing childView: UIView,
+                inside parentView: UIView,
+                headerViewHeight: CGFloat = 50)
+    {
+        super.init(frame: CGRect.zero)
+        commonInit(headerViewHeight: headerViewHeight, childView: childView, parentView: parentView)
+    }
 	required init?(coder aDecoder: NSCoder) {
 		fatalError("init(:coder) not implemented")
 	}
-	private func commonInit(headerViewHeight: CGFloat, childView: UIView, parentController: UIViewController) {
+    private func commonInit(headerViewHeight: CGFloat, childView: UIView, parentView: UIView) {
 		setupPositionManager(height: headerViewHeight)
-		setupHeaderView(frame: CGRect(origin: .zero, size: CGSize(width: parentController.view.bounds.width, height: headerViewHeight)))
+		setupHeaderView(frame: CGRect(origin: .zero, size: CGSize(width: parentView.bounds.width, height: headerViewHeight)))
 		setupContainerView(child: childView)
 		
-		parentController.view.addSubview(self)
-		leadingAnchor.constraint(equalTo: parentController.view.leadingAnchor).isActive = true
-		trailingAnchor.constraint(equalTo: parentController.view.trailingAnchor).isActive = true
-		
+        parentView.addSubview(self)
+		leadingAnchor.constraint(equalTo: parentView.leadingAnchor).isActive = true
+		trailingAnchor.constraint(equalTo: parentView.trailingAnchor).isActive = true
+
 		setRoundedCornersAndShadow()
 		setPosition(to: positionManager!.minPosition, animated: false)
 		backgroundColor = .white
@@ -204,7 +218,6 @@ public class DrawerView: UIView {
 	public func addSubviewToHeaderView(_ subview: UIView, aligned: HeaderViewChildAlignment) {
 		headerView?.addChildView(subview, alignment: aligned)
 	}
-	
 	@objc private func panned(_ sender: UIPanGestureRecognizer) {
 		if sender.state == .began {
 			if let scrollView = containerView?.subviews.first as? UIScrollView {
