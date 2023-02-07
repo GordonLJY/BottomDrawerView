@@ -35,7 +35,7 @@ public class DrawerView: UIView {
 		pan.delegate = self
 		return pan
 	}()
-    var isBodyDragEnabled: Bool = true
+    public var isBodyDragEnabled: Bool = true
 	
 	// MARK: - Properties
 	public var supportedPositions: Set<DVPosition> {
