@@ -35,6 +35,7 @@ public class DrawerView: UIView {
 		pan.delegate = self
 		return pan
 	}()
+    var isBodyDragEnabled: Bool = true
 	
 	// MARK: - Properties
 	public var supportedPositions: Set<DVPosition> {
@@ -121,7 +122,8 @@ public class DrawerView: UIView {
 		} else if let scrollView = childView.subviews.first as? UIScrollView {
 			setupScrollView(scrollView)
 		}
-		addGestureRecognizer(backgroundPanGesture)
+        addGestureRecognizer(backgroundPanGesture)
+
 		NotificationCenter.default.addObserver(self, selector: #selector(didChangeDeviceOrientation), name: UIDevice.orientationDidChangeNotification, object: nil)
 	}
 	
@@ -185,6 +187,15 @@ public class DrawerView: UIView {
 		let diff = abs(oldFrame.height - fullFrame.height)
 		func updateCurrentPosition() {
 			positionManager.currentPosition = position
+            // Update
+            if isBodyDragEnabled {
+                let isScrollEnabled = (currentPosition == positionManager.maxPosition)
+                if let scrollView = containerView?.subviews.first as? UIScrollView {
+                    scrollView.isScrollEnabled = isScrollEnabled
+                } else if let scrollView = containerView?.subviews.first?.subviews.first as? UIScrollView {
+                    scrollView.isScrollEnabled = isScrollEnabled
+                }
+            }
 			delegate?.drawerView(self, didFinishUpdatingPosition: position)
 		}
 		if animated {
@@ -219,14 +230,27 @@ public class DrawerView: UIView {
 		headerView?.addChildView(subview, alignment: aligned)
 	}
 	@objc private func panned(_ sender: UIPanGestureRecognizer) {
-		if sender.state == .began {
-			if let scrollView = containerView?.subviews.first as? UIScrollView {
-				enableScrollViewIfNeeded(scrollView)
-			} else if let scrollView = containerView?.subviews.first?.subviews.first as? UIScrollView {
-				enableScrollViewIfNeeded(scrollView)
-			}
-		}
-		positionManager?.didPan(sender)
+        if isBodyDragEnabled {
+            if sender.state == .began {
+                if let scrollView = containerView?.subviews.first as? UIScrollView {
+                    enableScrollViewIfNeeded(scrollView)
+                } else if let scrollView = containerView?.subviews.first?.subviews.first as? UIScrollView {
+                    enableScrollViewIfNeeded(scrollView)
+                }
+            }
+            positionManager?.didPan(sender)
+
+        } else {
+            if sender.state == .began {
+                if let scrollView = containerView?.subviews.first as? UIScrollView, !scrollView.isScrollEnabled {
+                    scrollView.isScrollEnabled = true
+                    scrollView.bounces = true
+                } else if let scrollView = containerView?.subviews.first?.subviews.first as? UIScrollView, !scrollView.isScrollEnabled {
+                    scrollView.isScrollEnabled = true
+                    scrollView.bounces = true
+                }
+            }
+        }
 	}
 	
 	private func setupScrollView(_ scrollView: UIScrollView) {
@@ -271,6 +295,7 @@ extension DrawerView: UIGestureRecognizerDelegate {
 		let oneIsBottomDrawerGesture = gestureRecognizer == backgroundPanGesture || otherGestureRecognizer == backgroundPanGesture || gestureRecognizer == headerView?.panGesture || otherGestureRecognizer == headerView?.panGesture
 		let otherIsScrollViewGesture = gestureRecognizer.view is UIScrollView || otherGestureRecognizer.view is UIScrollView
 		guard oneIsBottomDrawerGesture && otherIsScrollViewGesture else { return false }
+
 		if let scrollView = gestureRecognizer.view as? UIScrollView {
 			return scrollView.contentOffset.y <= 0
 		} else if let scrollView = otherGestureRecognizer.view as? UIScrollView {
@@ -282,11 +307,13 @@ extension DrawerView: UIGestureRecognizerDelegate {
 
 extension DrawerView: UIScrollViewDelegate {
 	public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-		backgroundPanGesture.isEnabled = scrollView.contentOffset.y <= 0
-		
-		let shouldBounce = scrollView.contentOffset.y > 0
-		if shouldBounce != scrollView.bounces {
-			scrollView.bounces = shouldBounce
-		}
+        if isBodyDragEnabled {
+            backgroundPanGesture.isEnabled = scrollView.contentOffset.y <= 0
+
+//            let shouldBounce = scrollView.contentOffset.y > 0
+//            if shouldBounce != scrollView.bounces {
+//                scrollView.bounces = shouldBounce
+//            }
+        }
 	}
 }
