@@ -35,7 +35,26 @@ public class DrawerView: UIView {
 		pan.delegate = self
 		return pan
 	}()
-    public var isBodyDragEnabled: Bool = true
+    public var isBodyDragEnabled: Bool = true {
+        didSet {
+            if isBodyDragEnabled {
+                if let scrollView = containerView?.subviews.first as? UIScrollView {
+                    enableScrollViewIfNeeded(scrollView)
+                } else if let scrollView = containerView?.subviews.first?.subviews.first as? UIScrollView {
+                    enableScrollViewIfNeeded(scrollView)
+                }
+
+            } else {
+                if let scrollView = containerView?.subviews.first as? UIScrollView, !scrollView.isScrollEnabled {
+                    scrollView.isScrollEnabled = true
+                    scrollView.bounces = true
+                } else if let scrollView = containerView?.subviews.first?.subviews.first as? UIScrollView, !scrollView.isScrollEnabled {
+                    scrollView.isScrollEnabled = true
+                    scrollView.bounces = true
+                }
+            }
+        }
+    }
 	
 	// MARK: - Properties
 	public var supportedPositions: Set<DVPosition> {
