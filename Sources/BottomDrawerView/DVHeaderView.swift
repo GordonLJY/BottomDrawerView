@@ -20,7 +20,8 @@ public enum HeaderViewChildAlignment {
 			centerRight(rightMargin: CGFloat),
 			topRight(rightMargin: CGFloat),
 			bottomRight(rightMargin: CGFloat),
-			fill(horizontalMargin: CGFloat)
+			fill(horizontalMargin: CGFloat),
+            fillAll(horizontalMargin: CGFloat)
 }
 
 class DVHeaderView: UIView {
@@ -124,7 +125,17 @@ class DVHeaderView: UIView {
 			let trailing = view.trailingAnchor.constraint(equalTo: trailingAnchor)
 			trailing.priority = .required
 			constraints += [leading, trailing, defaultTop, defaultBottom, vCenter]
-		}
+        case .fillAll:
+            let leading = view.leadingAnchor.constraint(equalTo: leadingAnchor)
+            leading.priority = .required
+            let trailing = view.trailingAnchor.constraint(equalTo: trailingAnchor)
+            trailing.priority = .required
+            let top = view.topAnchor.constraint(equalTo: topAnchor)
+            top.priority = .defaultHigh
+            let bottom = view.bottomAnchor.constraint(equalTo: bottomAnchor)
+            bottom.priority = .defaultHigh
+            constraints += [leading, trailing, top, bottom, vCenter]
+        }
 		constraints.forEach { $0.isActive = true }
 		addConstraints(constraints)
 	}
