@@ -36,8 +36,12 @@ class DVPositionManager {
 		supportedPositions.max() ?? DVPosition.defaultExpanded
 	}
 	
-	private var screenHeight: CGFloat { UIScreen.main.bounds.height }
-	private var screenWidth: CGFloat { UIScreen.main.bounds.width }
+	private var screenHeight: CGFloat {
+        keyWindowBound.height
+    }
+	private var screenWidth: CGFloat {
+        keyWindowBound.width
+    }
 	/**
 	A CGFloat value indicating the height of the view.
 	*/
@@ -70,7 +74,7 @@ class DVPositionManager {
 	}
 	
 	static func height(for position: DVPosition) -> CGFloat {
-		return UIScreen.main.bounds.height * position.percent
+		return keyWindowBound.bounds.height * position.percent
 	}
 	
 	/**
@@ -116,6 +120,15 @@ class DVPositionManager {
 		}
 		return currentPosition
 	}
+    
+    // Scene
+    static var keyWindowBound: CGRect {
+        let allWindows = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .flatMap({ $0.windows })
+        let firstKeyWindow = allWindows.first(where: { $0.isKeyWindow })
+        return firstKeyWindow?.bounds ?? UIScreen.main.bounds
+    }
 }
 
 extension DVPositionManager: DVHeaderViewDelegate {

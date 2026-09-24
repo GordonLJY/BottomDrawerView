@@ -296,7 +296,7 @@ extension DrawerView: DVPositionManagerDelegate {
 		guard let positionManager = positionManager else { return }
 		let transform = CGAffineTransform(translationX: 0, y: amount)
 		let newFrame = frame.applying(transform)
-		let screenHeight = UIScreen.main.bounds.height
+		let screenHeight = keyWindowBound.height
 		let isInsideLimit = newFrame.origin.y >= screenHeight - positionManager.totalHeight
 		if isInsideLimit {
 			frame = newFrame
@@ -307,6 +307,14 @@ extension DrawerView: DVPositionManagerDelegate {
 	func updateDrawerPosition(_ position: DVPosition) {
 		setPosition(to: position, animated: true)
 	}
+    
+    static var keyWindowBound: CGRect {
+        let allWindows = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .flatMap({ $0.windows })
+        let firstKeyWindow = allWindows.first(where: { $0.isKeyWindow })
+        return firstKeyWindow?.bounds ?? UIScreen.main.bounds
+    }
 }
 
 extension DrawerView: UIGestureRecognizerDelegate {
