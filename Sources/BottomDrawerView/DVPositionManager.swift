@@ -37,10 +37,10 @@ class DVPositionManager {
 	}
 	
 	private var screenHeight: CGFloat {
-        keyWindowBound.height
+        DVPositionManager.keyWindowBound.height
     }
 	private var screenWidth: CGFloat {
-        keyWindowBound.width
+        DVPositionManager.keyWindowBound.width
     }
 	/**
 	A CGFloat value indicating the height of the view.
@@ -74,7 +74,7 @@ class DVPositionManager {
 	}
 	
 	static func height(for position: DVPosition) -> CGFloat {
-		return keyWindowBound.bounds.height * position.percent
+		return keyWindowBound.height * position.percent
 	}
 	
 	/**

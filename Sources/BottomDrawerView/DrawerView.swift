@@ -308,7 +308,7 @@ extension DrawerView: DVPositionManagerDelegate {
 		setPosition(to: position, animated: true)
 	}
     
-    static var keyWindowBound: CGRect {
+    private var keyWindowBound: CGRect {
         let allWindows = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .flatMap({ $0.windows })
